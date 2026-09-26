@@ -3,6 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { authActions } from '@/store/auth/authActions';
 import { AppDispatch } from '@/store';
 import { showToast } from './toastUtils';
+import { APP_SCHEME } from '@/constants';
 import i18n from '@/i18n';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -25,7 +26,7 @@ export class SsoUtils {
     try {
       // Create redirect URI with custom scheme
       const redirectUri = AuthSession.makeRedirectUri({
-        scheme: 'chatwootapp',
+        scheme: APP_SCHEME,
         path: 'sso/callback',
       });
 

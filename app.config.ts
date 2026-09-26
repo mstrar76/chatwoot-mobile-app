@@ -1,17 +1,28 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
+// Branding and identifiers come from the environment so the same source builds the
+// upstream Chatwoot app or a white-labelled fork (see .env.example).
+const APP_NAME = process.env.EXPO_PUBLIC_APP_NAME || 'Chatwoot';
+const APP_ID = process.env.EXPO_PUBLIC_APP_ID || 'com.chatwoot.app';
+const APP_SCHEME = process.env.EXPO_PUBLIC_APP_SCHEME || 'chatwootapp';
+// Hosts whose conversation links open the app (comma-separated).
+const DEEP_LINK_HOSTS = (process.env.EXPO_PUBLIC_DEEP_LINK_HOSTS || 'app.chatwoot.com')
+  .split(',')
+  .map((host: string) => host.trim())
+  .filter(Boolean);
+
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
-    name: 'Chatwoot',
+    name: APP_NAME,
     slug: process.env.EXPO_PUBLIC_APP_SLUG || 'chatwoot-mobile',
     version: '4.9.6',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
-    scheme: 'chatwootapp',
+    scheme: APP_SCHEME,
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.chatwoot.app',
+      bundleIdentifier: APP_ID,
       infoPlist: {
         NSCameraUsageDescription:
           'This app requires access to the camera to upload images and videos.',
@@ -26,11 +37,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // Please use the relative path to the google-services.json file
       googleServicesFile: process.env.EXPO_PUBLIC_IOS_GOOGLE_SERVICES_FILE,
       entitlements: { 'aps-environment': 'production' },
-      associatedDomains: ['applinks:app.chatwoot.com'],
+      associatedDomains: DEEP_LINK_HOSTS.map((host: string) => `applinks:${host}`),
     },
     android: {
       adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#ffffff' },
-      package: 'com.chatwoot.app',
+      package: APP_ID,
       permissions: [
         'android.permission.CAMERA',
         'android.permission.RECORD_AUDIO',
@@ -42,21 +53,19 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           action: 'VIEW',
           autoVerify: true,
-          data: [
-            {
-              scheme: 'https',
-              host: 'app.chatwoot.com',
-              pathPrefix: '/app/accounts/',
-              pathPattern: '/*/conversations/*',
-            },
-          ],
+          data: DEEP_LINK_HOSTS.map((host: string) => ({
+            scheme: 'https',
+            host,
+            pathPrefix: '/app/accounts/',
+            pathPattern: '/*/conversations/*',
+          })),
           category: ['BROWSABLE', 'DEFAULT'],
         },
         {
           action: 'VIEW',
           data: [
             {
-              scheme: 'chatwootapp',
+              scheme: APP_SCHEME,
             },
           ],
           category: ['BROWSABLE', 'DEFAULT'],
@@ -69,7 +78,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         storybookEnabled: process.env.EXPO_STORYBOOK_ENABLED,
       },
     },
-    owner: 'chatwoot',
+    owner: process.env.EXPO_PUBLIC_EXPO_OWNER || 'chatwoot',
     plugins: [
       'expo-font',
       'expo-image',
