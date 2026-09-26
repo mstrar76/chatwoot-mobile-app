@@ -39,7 +39,8 @@
     "SETTINGS": "Confirgurações",
     "CHANGE_LANGUAGE": "Alterar idioma",
     "TERMS": "Termos & Condições",
-    "CHANGE_URL": "Mudar URL"
+    "CHANGE_URL": "Mudar URL",
+    "BACK_TO_ACCOUNTS": "Voltar para as minhas contas"
   },
   "FORGOT_PASSWORD": {
     "EMAIL": "Por favor, digite seu e-mail",
@@ -274,7 +275,8 @@
     "LOGOUT": "Desconectar",
     "SUBMIT": "submeter",
     "SET_LANGUAGE": "Definir idioma",
-    "DEBUG_ACTIONS": "Ações de depuração"
+    "DEBUG_ACTIONS": "Ações de depuração",
+    "ADD_INSTALLATION": "Adicionar servidor"
   },
   "NOTIFICATION": {
     "HEADER_TITLE": "Notificações",

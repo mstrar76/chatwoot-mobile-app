@@ -21,6 +21,8 @@ import {
   selectLocale,
 } from '@/store/settings/settingsSelectors';
 import { selectIsLoggingIn } from '@/store/auth/authSelectors';
+import { selectIsAddingSession } from '@/store/sessions/sessionsSelectors';
+import { cancelAddingSession } from '@/utils/sessionUtils';
 import { setLocale } from '@/store/settings/settingsSlice';
 import { useRefsContext } from '@/context/RefsContext';
 import { SsoUtils } from '@/utils/ssoUtils';
@@ -53,6 +55,7 @@ const LoginScreen = () => {
   const installationUrl = useAppSelector(selectInstallationUrl);
   const baseUrl = useAppSelector(selectBaseUrl);
   const activeLocale = useAppSelector(selectLocale);
+  const isAddingSession = useAppSelector(selectIsAddingSession);
 
   useEffect(() => {
     languagesModalSheetRef.current?.dismiss();
@@ -286,6 +289,15 @@ const LoginScreen = () => {
               {i18n.t('LOGIN.CHANGE_LANGUAGE')}
             </Animated.Text>
           </Pressable>
+          {isAddingSession && (
+            <Pressable
+              style={tailwind.style('flex-row justify-center items-center mt-4')}
+              onPress={() => cancelAddingSession(dispatch)}>
+              <Animated.Text style={tailwind.style('text-sm text-blue-800 font-inter-medium-24')}>
+                {i18n.t('LOGIN.BACK_TO_ACCOUNTS')}
+              </Animated.Text>
+            </Pressable>
+          )}
         </KeyboardAwareScrollView>
       </View>
       <Sheet ref={languagesModalSheetRef} detents={[0.7]} scrollable>

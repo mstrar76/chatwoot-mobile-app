@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { configureStore, ThunkAction, Action, Middleware, AnyAction } from '@reduxjs/toolkit';
+import { configureStore, ThunkAction, Action, Middleware } from '@reduxjs/toolkit';
 import {
   persistStore,
   persistReducer,
@@ -14,6 +14,7 @@ import { appReducer } from '@/store/reducers';
 import { setStore } from './storeAccessor';
 import { contactListenerMiddleware } from './contact/contactListener';
 import { repairPersistedWebSocketUrl } from './settings/settingsUtils';
+import { createSessionsRootReducer } from './sessions/sessionsRootReducer';
 
 // Disable this in testing environment
 const shouldLoadDebugger = __DEV__ && !process.env.JEST_WORKER_ID;
@@ -41,13 +42,8 @@ const persistConfig = {
 
 const middlewares: Middleware[] = [contactListenerMiddleware.middleware];
 
-const rootReducer = (state: ReturnType<typeof appReducer>, action: AnyAction) => {
-  if (action.type === 'auth/logout') {
-    const initialState = appReducer(undefined, { type: 'INIT' });
-    return { ...initialState, settings: state.settings };
-  }
-  return appReducer(state, action);
-};
+// Handles logout and switching between the installations the user is signed in to.
+const rootReducer = createSessionsRootReducer(appReducer);
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

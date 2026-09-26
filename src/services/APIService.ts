@@ -29,6 +29,13 @@ const isForPreviousAccount = (url?: string): boolean => {
   );
 };
 
+// True when a request was sent to an installation other than the active one (it was in flight
+// when the user switched installations), so its response/error should be ignored.
+const isForPreviousInstallation = (baseURL?: string): boolean => {
+  const activeInstallationUrl = getStore().getState().settings?.installationUrl;
+  return Boolean(baseURL && activeInstallationUrl && baseURL !== activeInstallationUrl);
+};
+
 const CLIENT_NAME = 'Chatwoot Mobile';
 const CLIENT_VERSION = Constants.expoConfig?.version ?? 'unknown';
 
@@ -102,7 +109,10 @@ class APIService {
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
         // Drop responses for a previous account so stale data can't repopulate the UI.
-        if (isForPreviousAccount(response.config.url)) {
+        if (
+          isForPreviousAccount(response.config.url) ||
+          isForPreviousInstallation(response.config.baseURL)
+        ) {
           return Promise.reject(
             new axios.CanceledError('Ignoring response for a previous account'),
           );
@@ -115,7 +125,10 @@ class APIService {
         }
         // Ignore errors for a previous account before global handling (avoids a stale 401
         // logging out or a stale error toast for the account just switched away from).
-        if (isForPreviousAccount(error.config?.url)) {
+        if (
+          isForPreviousAccount(error.config?.url) ||
+          isForPreviousInstallation(error.config?.baseURL)
+        ) {
           return Promise.reject(new axios.CanceledError('Ignoring error for a previous account'));
         }
         if (error.response?.status === 401) {

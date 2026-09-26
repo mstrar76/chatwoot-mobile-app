@@ -40,6 +40,7 @@ import { clearAllDeliveredNotifications } from '@/utils/pushUtils';
 import { dashboardAppActions } from '@/store/dashboard-app/dashboardAppActions';
 import { customAttributeActions } from '@/store/custom-attribute/customAttributeActions';
 import { clearSelection } from '@/store/conversation/conversationSelectedSlice';
+import { selectActiveSessionId } from '@/store/sessions/sessionsSelectors';
 
 const Tab = createBottomTabNavigator();
 
@@ -194,10 +195,13 @@ const Tabs = () => {
 
 export const AppTabs = () => {
   const isLoggedIn = useAppSelector(selectLoggedIn);
+  const activeSessionId = useAppSelector(selectActiveSessionId);
 
   if (isLoggedIn) {
+    // Keyed by installation session so switching installations re-runs the full bootstrap
+    // (profile, push registration, websocket) against the new server.
     return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator key={activeSessionId ?? 'session'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Tab" component={Tabs} />
         <Stack.Screen
           options={{ animation: 'slide_from_right' }}

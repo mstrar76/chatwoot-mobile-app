@@ -49,7 +49,8 @@
       "MESSAGE": "Your account requires two-factor authentication. Sign in to Chatwoot on the web to set it up, then come back here.",
       "OPEN_WEB": "Open web app",
       "DISMISS": "OK"
-    }
+    },
+    "BACK_TO_ACCOUNTS": "Back to my accounts"
   },
   "FORGOT_PASSWORD": {
     "EMAIL": "Please enter your email",
@@ -319,7 +320,8 @@
     "LOGOUT": "Logout",
     "SUBMIT": "Submit",
     "SET_LANGUAGE": "Set Language",
-    "DEBUG_ACTIONS": "Debug Actions"
+    "DEBUG_ACTIONS": "Debug Actions",
+    "ADD_INSTALLATION": "Add installation"
   },
   "NOTIFICATION": {
     "HEADER_TITLE": "Notifications",

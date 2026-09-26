@@ -13,6 +13,8 @@ type AccountCellProps = {
   currentAccountId: number | undefined;
   changeAccount: (accountId: number) => void;
   isLastItem: boolean;
+  isSelected?: boolean;
+  caption?: string;
 };
 
 const AccountCell = ({
@@ -21,6 +23,8 @@ const AccountCell = ({
   currentAccountId,
   changeAccount,
   isLastItem,
+  isSelected: isSelectedProp,
+  caption,
 }: AccountCellProps) => {
   const hapticSelection = useHaptic();
 
@@ -29,7 +33,7 @@ const AccountCell = ({
     changeAccount(item.id);
   };
 
-  const isSelected = item.id === currentAccountId;
+  const isSelected = isSelectedProp ?? item.id === currentAccountId;
 
   return (
     <Pressable onPress={handlePress}>
@@ -52,6 +56,14 @@ const AccountCell = ({
               )}>
               {item.role}
             </Text>
+            {!!caption && (
+              <Text
+                style={tailwind.style(
+                  'text-xs text-gray-700 font-inter-420-20 leading-[16px] tracking-[0.16px]',
+                )}>
+                {caption}
+              </Text>
+            )}
           </View>
           {isSelected && <Icon icon={<TickIcon />} size={20} />}
         </Animated.View>
@@ -82,3 +94,64 @@ export const SwitchAccount = ({
     ))}
   </Animated.View>
 );
+
+export type InstallationAccount = {
+  key: string;
+  sessionId: string;
+  accountId: number;
+  name: string;
+  role: string;
+  baseUrl: string;
+  email: string;
+};
+
+// Accounts across every installation the user is signed in to, plus "add installation".
+export const SwitchInstallationAccount = ({
+  entries,
+  activeSessionId,
+  currentAccountId,
+  onSelect,
+  onAddInstallation,
+  addInstallationLabel,
+}: {
+  entries: InstallationAccount[];
+  activeSessionId: string | null;
+  currentAccountId: number | undefined;
+  onSelect: (sessionId: string, accountId: number) => void;
+  onAddInstallation: () => void;
+  addInstallationLabel: string;
+}) => {
+  const hapticSelection = useHaptic();
+  return (
+    <Animated.View style={tailwind.style('py-1 pl-3')}>
+      {entries.map((entry, index) => (
+        <AccountCell
+          key={entry.key}
+          item={{ id: entry.accountId, name: entry.name, role: entry.role } as Account}
+          index={index}
+          currentAccountId={currentAccountId}
+          isSelected={
+            entry.sessionId === activeSessionId && entry.accountId === Number(currentAccountId)
+          }
+          caption={`${entry.baseUrl} · ${entry.email}`}
+          changeAccount={accountId => onSelect(entry.sessionId, accountId)}
+          isLastItem={false}
+        />
+      ))}
+      <Pressable
+        onPress={() => {
+          hapticSelection?.();
+          onAddInstallation();
+        }}>
+        <View style={tailwind.style('ml-3 py-[11px] pr-3')}>
+          <Text
+            style={tailwind.style(
+              'text-base text-blue-800 font-inter-medium-24 leading-[21px] tracking-[0.16px]',
+            )}>
+            {addInstallationLabel}
+          </Text>
+        </View>
+      </Pressable>
+    </Animated.View>
+  );
+};
