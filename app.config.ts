@@ -119,6 +119,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             targetSdkVersion: 36,
             enableProguardInReleaseBuilds: true,
           },
+          // Xcode 27 / iOS 27 refuse to launch apps without the UIKit scene lifecycle
+          // (expo/expo#46664). SDK 57 needs this opt-in; SDK 58+ enables it by default.
+          ios: {
+            enableSceneSupport: true,
+          },
         },
       ],
       './with-ffmpeg-pod.js',
