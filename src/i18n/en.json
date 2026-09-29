@@ -586,5 +586,10 @@
     "TONE_CONFIDENT": "Confident",
     "GENERATION_FAILED": "Failed to generate content. Please try again.",
     "FOLLOW_UP_FAILED": "Failed to send follow-up. Please try again."
+  },
+  "UNIFIED": {
+    "ALL_ACCOUNTS": "All accounts",
+    "EMPTY": "No conversations in your accounts.",
+    "FAILED": "Could not load: %{accounts}"
   }
 }

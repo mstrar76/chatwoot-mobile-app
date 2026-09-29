@@ -5,6 +5,8 @@ export const selectSessions = (state: RootState) => state.sessions.list;
 
 export const selectActiveSessionId = (state: RootState) => state.sessions.activeId;
 
+export const selectUnifiedView = (state: RootState) => !!state.sessions.unifiedView;
+
 export const selectIsAddingSession = (state: RootState) => state.sessions.returnToId !== null;
 
 export interface SessionAccountEntry {

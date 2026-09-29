@@ -113,6 +113,9 @@ export const SwitchInstallationAccount = ({
   onSelect,
   onAddInstallation,
   addInstallationLabel,
+  allAccountsLabel,
+  isAllAccountsSelected,
+  onAllAccounts,
 }: {
   entries: InstallationAccount[];
   activeSessionId: string | null;
@@ -120,10 +123,23 @@ export const SwitchInstallationAccount = ({
   onSelect: (sessionId: string, accountId: number) => void;
   onAddInstallation: () => void;
   addInstallationLabel: string;
+  allAccountsLabel?: string;
+  isAllAccountsSelected?: boolean;
+  onAllAccounts?: () => void;
 }) => {
   const hapticSelection = useHaptic();
   return (
     <Animated.View style={tailwind.style('py-1 pl-3')}>
+      {!!onAllAccounts && entries.length > 1 && (
+        <AccountCell
+          item={{ id: -1, name: allAccountsLabel, role: '' } as unknown as Account}
+          index={-1}
+          currentAccountId={undefined}
+          isSelected={!!isAllAccountsSelected}
+          changeAccount={() => onAllAccounts()}
+          isLastItem={false}
+        />
+      )}
       {entries.map((entry, index) => (
         <AccountCell
           key={entry.key}

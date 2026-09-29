@@ -18,6 +18,8 @@ export interface SessionsState {
   activeId: string | null;
   // Session to go back to when "add installation" is cancelled.
   returnToId: string | null;
+  // Conversation list shows every signed-in account at once.
+  unifiedView?: boolean;
 }
 
 export const initialSessionsState: SessionsState = {
@@ -26,8 +28,15 @@ export const initialSessionsState: SessionsState = {
   returnToId: null,
 };
 
-// Cross-slice transitions are applied in `sessionsRootReducer`; this reducer only owns the shape.
-const sessionsReducer = (state: SessionsState = initialSessionsState): SessionsState => state;
+export const setUnifiedView = createAction<boolean>('sessions/setUnifiedView');
+
+// Cross-slice transitions are applied in `sessionsRootReducer`; this reducer only owns the
+// unified-view preference.
+const sessionsReducer = (
+  state: SessionsState = initialSessionsState,
+  action: { type: string; payload?: unknown },
+): SessionsState =>
+  setUnifiedView.match(action) ? { ...state, unifiedView: action.payload } : state;
 
 export const switchSession = createAction<{ sessionId: string; accountId?: number }>(
   'sessions/switch',

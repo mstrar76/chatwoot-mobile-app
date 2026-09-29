@@ -12,7 +12,8 @@ import { useHaptic } from '@/utils';
 import { getFilteredConversations } from '@/store/conversation/conversationSelectors';
 import { selectCurrentUserAccount, selectUserId } from '@/store/auth/authSelectors';
 import { selectBaseUrl } from '@/store/settings/settingsSelectors';
-import { selectSessions } from '@/store/sessions/sessionsSelectors';
+import { selectSessions, selectUnifiedView } from '@/store/sessions/sessionsSelectors';
+import i18n from '@/i18n';
 import { AccountSwitcherSheet } from '@/components-next/sheet-components/AccountSwitcherSheet';
 import type { SheetRef } from '@/components-next/common/sheet/Sheet';
 import {
@@ -59,12 +60,15 @@ export const ConversationHeader = () => {
   const currentAccount = useAppSelector(selectCurrentUserAccount);
   const baseUrl = useAppSelector(selectBaseUrl);
   const sessions = useAppSelector(selectSessions);
+  const isUnifiedView = useAppSelector(selectUnifiedView);
   // Show the installation too once more than one is signed in.
-  const accountLabel = currentAccount
-    ? sessions.length > 1
-      ? `${currentAccount.name} · ${baseUrl}`
-      : currentAccount.name
-    : undefined;
+  const accountLabel = isUnifiedView
+    ? i18n.t('UNIFIED.ALL_ACCOUNTS')
+    : currentAccount
+      ? sessions.length > 1
+        ? `${currentAccount.name} · ${baseUrl}`
+        : currentAccount.name
+      : undefined;
 
   const allConversations = useAppSelector(state =>
     getFilteredConversations(state, filters, userId),

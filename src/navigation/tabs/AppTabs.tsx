@@ -41,6 +41,8 @@ import { dashboardAppActions } from '@/store/dashboard-app/dashboardAppActions';
 import { customAttributeActions } from '@/store/custom-attribute/customAttributeActions';
 import { clearSelection } from '@/store/conversation/conversationSelectedSlice';
 import { selectActiveSessionId } from '@/store/sessions/sessionsSelectors';
+import { takePendingConversation } from '@/utils/sessionUtils';
+import { StackActions, useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
@@ -87,6 +89,16 @@ const Tabs = () => {
   const userId = useAppSelector(selectUserId);
   const accountId = useAppSelector(selectCurrentUserAccountId);
   const webSocketUrl = useAppSelector(selectWebSocketUrl);
+  const navigation = useNavigation();
+
+  // Opened from the unified list on another installation: the stack remounted, open it now.
+  useEffect(() => {
+    const conversationId = takePendingConversation();
+    if (conversationId) {
+      navigation.dispatch(StackActions.push('ChatScreen', { conversationId }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // Here is the place we are loading all the data for the app first time first time or user switches account

@@ -10,6 +10,8 @@ import { SwitchInstallationAccount } from '@/components-next/sheet-components/Sw
 import { selectCurrentUserAccountId } from '@/store/auth/authSelectors';
 import { selectActiveSessionId, selectSessionAccounts } from '@/store/sessions/sessionsSelectors';
 import { startAddingSession, switchToSessionAccount } from '@/utils/sessionUtils';
+import { setUnifiedView } from '@/store/sessions/sessionsSlice';
+import { selectUnifiedView } from '@/store/sessions/sessionsSelectors';
 
 // Account list across every signed-in installation, plus "add installation". Shared by the
 // Settings screen and the conversation list header.
@@ -26,15 +28,22 @@ export const AccountSwitcherSheet = forwardRef<SheetRef>((_, ref) => {
   const entries = useAppSelector(selectSessionAccounts);
   const activeSessionId = useAppSelector(selectActiveSessionId);
   const currentAccountId = useAppSelector(selectCurrentUserAccountId);
+  const isUnifiedView = useAppSelector(selectUnifiedView);
 
   const onSelect = (sessionId: string, accountId: number) => {
     sheetRef.current?.dismiss();
+    dispatch(setUnifiedView(false));
     const isSameInstallation = sessionId === activeSessionId;
     switchToSessionAccount(dispatch, sessionId, accountId);
     // Another installation remounts the whole logged-in stack (keyed by session).
     if (isSameInstallation) {
       navigation.dispatch(StackActions.replace('Tab'));
     }
+  };
+
+  const onAllAccounts = () => {
+    sheetRef.current?.dismiss();
+    dispatch(setUnifiedView(true));
   };
 
   const onAddInstallation = () => {
@@ -48,8 +57,11 @@ export const AccountSwitcherSheet = forwardRef<SheetRef>((_, ref) => {
         <BottomSheetHeader headerText={i18n.t('SETTINGS.SWITCH_ACCOUNT')} />
         <SwitchInstallationAccount
           entries={entries}
-          activeSessionId={activeSessionId}
+          activeSessionId={isUnifiedView ? null : activeSessionId}
           currentAccountId={currentAccountId}
+          allAccountsLabel={i18n.t('UNIFIED.ALL_ACCOUNTS')}
+          isAllAccountsSelected={isUnifiedView}
+          onAllAccounts={onAllAccounts}
           onSelect={onSelect}
           onAddInstallation={onAddInstallation}
           addInstallationLabel={i18n.t('SETTINGS.ADD_INSTALLATION')}

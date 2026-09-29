@@ -46,6 +46,8 @@ import { clearAllContacts } from '@/store/contact/contactSlice';
 import { clearAssignableAgents } from '@/store/assignable-agent/assignableAgentSlice';
 
 import i18n from '@/i18n';
+import { selectUnifiedView } from '@/store/sessions/sessionsSelectors';
+import { UnifiedConversationList } from './components/unified/UnifiedConversationList';
 import ActionBottomSheet from '@/navigation/tabs/ActionBottomSheet';
 import { getCurrentRouteName } from '@/utils/navigationUtils';
 import { useTabBarHeight } from '@/utils';
@@ -251,6 +253,7 @@ const ConversationScreen = () => {
   const dispatch = useAppDispatch();
 
   const { filtersModalSheetRef } = useRefsContext();
+  const isUnifiedView = useAppSelector(selectUnifiedView);
 
   const handleOnDismiss = () => {
     /**
@@ -288,7 +291,7 @@ const ConversationScreen = () => {
         <Animated.View
           style={tailwind.style('flex-1')}
           layout={LinearTransition.springify().damping(22).stiffness(180)}>
-          <ConversationList />
+          {isUnifiedView ? <UnifiedConversationList /> : <ConversationList />}
         </Animated.View>
         <Sheet
           ref={filtersModalSheetRef}

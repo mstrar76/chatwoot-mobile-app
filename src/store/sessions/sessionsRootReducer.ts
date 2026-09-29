@@ -37,7 +37,7 @@ const activateSession = (
       version: '',
     },
     auth: { ...fresh.auth, user, headers: target.headers },
-    sessions: { list: state.sessions.list, activeId: target.id, returnToId: null },
+    sessions: { ...state.sessions, activeId: target.id, returnToId: null },
   };
 };
 
@@ -74,7 +74,10 @@ const syncActiveSession = (state: AppState): AppState => {
   const nextList = existing
     ? list.map(item => (item.id === id ? session : item))
     : [...list, session];
-  return { ...state, sessions: { list: nextList, activeId: id, returnToId: null } };
+  return {
+    ...state,
+    sessions: { ...state.sessions, list: nextList, activeId: id, returnToId: null },
+  };
 };
 
 export const createSessionsRootReducer =
@@ -117,7 +120,7 @@ export const createSessionsRootReducer =
             notificationSettings: fresh.settings.notificationSettings,
           },
           sessions: {
-            list: state.sessions.list,
+            ...state.sessions,
             activeId: null,
             returnToId: state.sessions.activeId,
           },

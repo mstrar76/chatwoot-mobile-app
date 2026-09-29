@@ -483,5 +483,10 @@
     "EXECUTION_SUCCESS": "Macro executada com sucesso",
     "EXECUTION_ERROR": "Falha ao executar macro",
     "NO_MACROS": "Nenhuma macro encontrada"
+  },
+  "UNIFIED": {
+    "ALL_ACCOUNTS": "Todas as contas",
+    "EMPTY": "Nenhuma conversa nas suas contas.",
+    "FAILED": "Não foi possível carregar: %{accounts}"
   }
 }

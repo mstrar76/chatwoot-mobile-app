@@ -1,6 +1,6 @@
 import { appReducer } from '@/store/reducers';
 import { createSessionsRootReducer } from '../sessionsRootReducer';
-import { beginAddSession, cancelAddSession, switchSession } from '../sessionsSlice';
+import { beginAddSession, cancelAddSession, setUnifiedView, switchSession } from '../sessionsSlice';
 import { setFilters } from '@/store/conversation/conversationFilterSlice';
 import type { User } from '@/types/User';
 
@@ -120,6 +120,15 @@ describe('sessionsRootReducer', () => {
 
     state = rootReducer(state, { type: 'auth/logout' });
     expect(state.conversationFilter.filters.assignee_type).toBe('me');
+  });
+
+  it('keeps the unified view across installation switches', () => {
+    let state = signIn(initial, 'a.example.com', makeUser(1, [1]), 'tokA');
+    state = rootReducer(state, setUnifiedView(true));
+    state = rootReducer(state, beginAddSession());
+    state = signIn(state, 'b.example.com', makeUser(7, [1]), 'tokB');
+    state = rootReducer(state, switchSession({ sessionId: 'a.example.com#1' }));
+    expect(state.sessions.unifiedView).toBe(true);
   });
 
   it('does not create a new state object for unrelated actions', () => {
