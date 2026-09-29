@@ -10,6 +10,7 @@ const DEEP_LINK_HOSTS = (process.env.EXPO_PUBLIC_DEEP_LINK_HOSTS || 'app.chatwoo
   .split(',')
   .map((host: string) => host.trim())
   .filter(Boolean);
+const IOS_PERSONAL_TEAM = process.env.EXPO_PUBLIC_IOS_PERSONAL_TEAM === 'true';
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
@@ -36,8 +37,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       // Please use the relative path to the google-services.json file
       googleServicesFile: process.env.EXPO_PUBLIC_IOS_GOOGLE_SERVICES_FILE,
-      entitlements: { 'aps-environment': 'production' },
-      associatedDomains: DEEP_LINK_HOSTS.map((host: string) => `applinks:${host}`),
+      // A free (personal team) Apple account cannot sign push or associated-domain
+      // entitlements, so local device builds on such an account drop them.
+      ...(IOS_PERSONAL_TEAM
+        ? {}
+        : {
+            entitlements: { 'aps-environment': 'production' },
+            associatedDomains: DEEP_LINK_HOSTS.map((host: string) => `applinks:${host}`),
+          }),
     },
     android: {
       adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#ffffff' },
@@ -130,6 +137,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       './with-android-notification-channel.js',
       './with-notifee-maven-repo.js',
       './with-ios-modular-headers.js',
+      // Keep last: removes entitlements other plugins add.
+      './with-ios-personal-team.js',
     ],
     androidNavigationBar: { backgroundColor: '#ffffff' },
   };
