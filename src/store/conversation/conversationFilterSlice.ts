@@ -7,14 +7,20 @@ import { RootState } from '@/store';
 export type FilterState = Record<ConversationFilterOptions, string>;
 
 export const defaultFilterState: FilterState = {
-  assignee_type: 'me',
+  // Default to every conversation so nothing assigned to others is hidden by surprise.
+  assignee_type: 'all',
   status: 'open',
   sort_by: 'latest',
   inbox_id: '0',
 };
 
+// Filters remembered as the user's choice; they survive account and installation switches.
+// inbox_id is account-specific, so it is never remembered.
+type RememberedFilters = Partial<Omit<FilterState, 'inbox_id'>>;
+
 interface ConversationFilterState {
   filters: FilterState;
+  remembered?: RememberedFilters;
 }
 
 const initialState: ConversationFilterState = {
@@ -31,14 +37,23 @@ const conversationFilterSlice = createSlice({
     ) => {
       const { key, value } = action.payload;
       state.filters[key] = value;
+      if (key !== 'inbox_id') {
+        state.remembered = { ...state.remembered, [key]: value };
+      }
     },
+    // Back to the remembered choice (used on account switch).
     resetFilters: state => {
+      state.filters = { ...defaultFilterState, ...state.remembered };
+    },
+    // Back to the app defaults, forgetting the remembered choice.
+    clearFilters: state => {
       state.filters = defaultFilterState;
+      state.remembered = undefined;
     },
   },
 });
 
-export const { setFilters, resetFilters } = conversationFilterSlice.actions;
+export const { setFilters, resetFilters, clearFilters } = conversationFilterSlice.actions;
 
 export const selectFilters = (state: RootState) => state.conversationFilter.filters;
 

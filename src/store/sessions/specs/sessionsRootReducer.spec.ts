@@ -1,6 +1,7 @@
 import { appReducer } from '@/store/reducers';
 import { createSessionsRootReducer } from '../sessionsRootReducer';
 import { beginAddSession, cancelAddSession, switchSession } from '../sessionsSlice';
+import { setFilters } from '@/store/conversation/conversationFilterSlice';
 import type { User } from '@/types/User';
 
 jest.mock('react-native-permissions', () => jest.requireActual('react-native-permissions/mock'));
@@ -105,6 +106,20 @@ describe('sessionsRootReducer', () => {
     state = rootReducer(state, { type: 'auth/logout' });
     expect(state.sessions.list).toHaveLength(0);
     expect(state.auth.user).toBeNull();
+  });
+
+  it('keeps the chosen conversation filter across installations and logout', () => {
+    let state = signIn(initial, 'a.example.com', makeUser(1, [1]), 'tokA');
+    state = rootReducer(state, setFilters({ key: 'assignee_type', value: 'me' }));
+    state = rootReducer(state, beginAddSession());
+    expect(state.conversationFilter.filters.assignee_type).toBe('me');
+
+    state = signIn(state, 'b.example.com', makeUser(7, [1]), 'tokB');
+    state = rootReducer(state, switchSession({ sessionId: 'a.example.com#1' }));
+    expect(state.conversationFilter.filters.assignee_type).toBe('me');
+
+    state = rootReducer(state, { type: 'auth/logout' });
+    expect(state.conversationFilter.filters.assignee_type).toBe('me');
   });
 
   it('does not create a new state object for unrelated actions', () => {

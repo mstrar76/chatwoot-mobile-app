@@ -25,8 +25,9 @@ describe('getFilteredConversations', () => {
   it('skips records without meta', () => {
     const withoutMeta = { ...conversation, id: 3, meta: undefined } as unknown as Conversation;
     const state = buildState({ 1: assignedToMe, 3: withoutMeta });
+    const filters = { ...defaultFilterState, assignee_type: 'me' };
 
-    expect(getFilteredConversations(state, defaultFilterState, userId)).toEqual([assignedToMe]);
+    expect(getFilteredConversations(state, filters, userId)).toEqual([assignedToMe]);
   });
 
   it('treats a record without meta as unassigned', () => {

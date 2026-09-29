@@ -16,7 +16,7 @@ import { selectSessions } from '@/store/sessions/sessionsSelectors';
 import { AccountSwitcherSheet } from '@/components-next/sheet-components/AccountSwitcherSheet';
 import type { SheetRef } from '@/components-next/common/sheet/Sheet';
 import {
-  resetFilters,
+  clearFilters,
   selectFilters,
   defaultFilterState,
   FilterState,
@@ -134,7 +134,7 @@ export const ConversationHeader = () => {
 
   const handleClearFilter = () => {
     hapticSuccess?.();
-    dispatch(resetFilters());
+    dispatch(clearFilters());
   };
 
   return (

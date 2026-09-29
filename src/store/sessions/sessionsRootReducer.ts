@@ -27,6 +27,7 @@ const activateSession = (
   const user = accountId ? { ...target.user, account_id: accountId } : target.user;
   return {
     ...fresh,
+    conversationFilter: keepFilterPreference(fresh, state),
     settings: {
       ...state.settings,
       baseUrl: target.baseUrl,
@@ -38,6 +39,14 @@ const activateSession = (
     auth: { ...fresh.auth, user, headers: target.headers },
     sessions: { list: state.sessions.list, activeId: target.id, returnToId: null },
   };
+};
+
+// The conversation filter the user chose is a device preference, not per-installation data.
+const keepFilterPreference = (fresh: AppState, previous: AppState) => {
+  const { remembered } = previous.conversationFilter;
+  return remembered
+    ? { filters: { ...fresh.conversationFilter.filters, ...remembered }, remembered }
+    : fresh.conversationFilter;
 };
 
 // Keeps the stored copy of the active session in step with `auth` (login, profile refresh,
@@ -87,7 +96,11 @@ export const createSessionsRootReducer =
           );
         }
         const fresh = reducer(undefined, { type: 'INIT' });
-        return { ...fresh, settings: state.settings };
+        return {
+          ...fresh,
+          settings: state.settings,
+          conversationFilter: keepFilterPreference(fresh, state),
+        };
       }
       if (switchSession.match(action)) {
         return syncActiveSession(
@@ -98,6 +111,7 @@ export const createSessionsRootReducer =
         const fresh = reducer(undefined, { type: 'INIT' });
         return {
           ...fresh,
+          conversationFilter: keepFilterPreference(fresh, state),
           settings: {
             ...state.settings,
             notificationSettings: fresh.settings.notificationSettings,
