@@ -3,7 +3,6 @@ import { StatusBar, Text, Platform, Pressable, ScrollView } from 'react-native';
 import Animated from 'react-native-reanimated';
 // import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StackActions, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import DeviceInfo from 'react-native-device-info';
@@ -11,8 +10,6 @@ import ChatWootWidget from '@chatwoot/react-native-widget';
 import { useSelector } from 'react-redux';
 import * as Application from 'expo-application';
 import { Account, AvailabilityStatus } from '@/types';
-import { switchToSessionAccount, startAddingSession } from '@/utils/sessionUtils';
-import { selectActiveSessionId, selectSessionAccounts } from '@/store/sessions/sessionsSelectors';
 
 import { RecentSearches } from '@/screens/search/utils/recentSearches';
 import i18n from 'i18n';
@@ -26,7 +23,7 @@ import {
   LanguageList,
   AvailabilityStatusList,
   NotificationPreferences,
-  SwitchInstallationAccount,
+  AccountSwitcherSheet,
   SettingsList,
 } from '@/components-next';
 import { Sheet } from '@/components-next/common/sheet/Sheet';
@@ -68,7 +65,6 @@ const buildNumber = Application.nativeBuildVersion;
 const appVersionDetails = buildNumber ? `${appVersion} (${buildNumber})` : appVersion;
 
 const SettingsScreen = () => {
-  const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const tabBarHeight = useTabBarHeight();
   const availabilityStatus =
@@ -126,9 +122,6 @@ const SettingsScreen = () => {
     ? accounts.find((account: Account) => account.id === activeAccountId)?.name || ''
     : '';
 
-  const sessionAccounts = useAppSelector(selectSessionAccounts);
-  const activeSessionId = useAppSelector(selectActiveSessionId);
-
   // Always available: the sheet also lets the user sign in to another installation.
   const enableAccountSwitch = true;
 
@@ -161,21 +154,6 @@ const SettingsScreen = () => {
 
   const onChangeLanguage = (locale: string) => {
     dispatch(setLocale(locale));
-  };
-
-  const changeAccount = (sessionId: string, accountId: number) => {
-    switchAccountSheetRef.current?.dismiss();
-    const isSameInstallation = sessionId === activeSessionId;
-    switchToSessionAccount(dispatch, sessionId, accountId);
-    // Another installation remounts the whole logged-in stack (keyed by session).
-    if (isSameInstallation) {
-      navigation.dispatch(StackActions.replace('Tab'));
-    }
-  };
-
-  const addInstallation = () => {
-    switchAccountSheetRef.current?.dismiss();
-    startAddingSession(dispatch);
   };
 
   useEffect(() => {
@@ -337,19 +315,7 @@ const SettingsScreen = () => {
         <BottomSheetHeader headerText={i18n.t('SETTINGS.NOTIFICATION_PREFERENCES')} />
         <NotificationPreferences />
       </Sheet>
-      <Sheet ref={switchAccountSheetRef} detents={[0.6]} scrollable>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <BottomSheetHeader headerText={i18n.t('SETTINGS.SWITCH_ACCOUNT')} />
-          <SwitchInstallationAccount
-            entries={sessionAccounts}
-            activeSessionId={activeSessionId}
-            currentAccountId={activeAccountId}
-            onSelect={changeAccount}
-            onAddInstallation={addInstallation}
-            addInstallationLabel={i18n.t('SETTINGS.ADD_INSTALLATION')}
-          />
-        </ScrollView>
-      </Sheet>
+      <AccountSwitcherSheet ref={switchAccountSheetRef} />
       <Sheet ref={debugActionsSheetRef} detents={[0.36]}>
         <BottomSheetHeader headerText={i18n.t('SETTINGS.DEBUG_ACTIONS')} />
         <DebugActions />

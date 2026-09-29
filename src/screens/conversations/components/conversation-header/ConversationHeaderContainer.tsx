@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -10,7 +10,11 @@ import { useConversationListStateContext } from '@/context';
 import { tailwind } from '@/theme';
 import { useHaptic } from '@/utils';
 import { getFilteredConversations } from '@/store/conversation/conversationSelectors';
-import { selectUserId } from '@/store/auth/authSelectors';
+import { selectCurrentUserAccount, selectUserId } from '@/store/auth/authSelectors';
+import { selectBaseUrl } from '@/store/settings/settingsSelectors';
+import { selectSessions } from '@/store/sessions/sessionsSelectors';
+import { AccountSwitcherSheet } from '@/components-next/sheet-components/AccountSwitcherSheet';
+import type { SheetRef } from '@/components-next/common/sheet/Sheet';
 import {
   resetFilters,
   selectFilters,
@@ -50,6 +54,17 @@ export const ConversationHeader = () => {
   const navigation = useNavigation();
 
   const { openedRowIndex } = useConversationListStateContext();
+
+  const accountSwitcherRef = useRef<SheetRef>(null);
+  const currentAccount = useAppSelector(selectCurrentUserAccount);
+  const baseUrl = useAppSelector(selectBaseUrl);
+  const sessions = useAppSelector(selectSessions);
+  // Show the installation too once more than one is signed in.
+  const accountLabel = currentAccount
+    ? sessions.length > 1
+      ? `${currentAccount.name} · ${baseUrl}`
+      : currentAccount.name
+    : undefined;
 
   const allConversations = useAppSelector(state =>
     getFilteredConversations(state, filters, userId),
@@ -131,8 +146,11 @@ export const ConversationHeader = () => {
         onLeftIconPress={handleLeftIconPress}
         onRightIconPress={handleRightIconPress}
         onClearFilter={handleClearFilter}
+        accountLabel={accountLabel}
+        onTitlePress={() => accountSwitcherRef.current?.present()}
       />
       {currentState === 'Filter' ? <ConversationFilterBar /> : null}
+      <AccountSwitcherSheet ref={accountSwitcherRef} />
     </Animated.View>
   );
 };

@@ -23,6 +23,9 @@ type ConversationHeaderPresenterProps = {
   onLeftIconPress: () => void;
   onRightIconPress: () => void;
   onClearFilter: () => void;
+  // Active account (and installation when several are signed in); tapping switches account.
+  accountLabel?: string;
+  onTitlePress?: () => void;
 };
 
 type RightSectionProps = {
@@ -41,15 +44,32 @@ type LeftSlotProps = {
   animatedStyle: ViewStyle | AnimatedStyle<ViewStyle>;
 };
 
-const HeaderTitle = () => (
+const HeaderTitle = ({
+  accountLabel,
+  onPress,
+}: {
+  accountLabel?: string;
+  onPress?: () => void;
+}) => (
   <Animated.View style={tailwind.style('flex-2')}>
-    <Text
-      numberOfLines={1}
-      style={tailwind.style(
-        'text-[17px] font-inter-medium-24 tracking-[0.32px] leading-[17px] text-center text-gray-950',
-      )}>
-      {i18n.t('CONVERSATION.HEADER.TITLE')}
-    </Text>
+    <Pressable onPress={onPress} disabled={!onPress} hitSlop={8}>
+      <Text
+        numberOfLines={1}
+        style={tailwind.style(
+          'text-[17px] font-inter-medium-24 tracking-[0.32px] leading-[17px] text-center text-gray-950',
+        )}>
+        {i18n.t('CONVERSATION.HEADER.TITLE')}
+      </Text>
+      {!!accountLabel && (
+        <Text
+          numberOfLines={1}
+          style={tailwind.style(
+            'pt-1 text-[12px] font-inter-420-20 leading-[14px] text-center text-blue-800',
+          )}>
+          {`${accountLabel} ▾`}
+        </Text>
+      )}
+    </Pressable>
   </Animated.View>
 );
 
@@ -182,6 +202,8 @@ export const ConversationHeaderPresenter = ({
   onLeftIconPress,
   onRightIconPress,
   onClearFilter,
+  accountLabel,
+  onTitlePress,
 }: ConversationHeaderPresenterProps) => {
   const { handlers, animatedStyle } = useScaleAnimation();
 
@@ -197,7 +219,7 @@ export const ConversationHeaderPresenter = ({
         handlers={handlers}
         animatedStyle={animatedStyle}
       />
-      <HeaderTitle />
+      <HeaderTitle accountLabel={accountLabel} onPress={onTitlePress} />
       <RightSection
         currentState={currentState}
         filtersAppliedCount={filtersAppliedCount}
