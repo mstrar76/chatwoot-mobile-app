@@ -10,6 +10,8 @@ const DEEP_LINK_HOSTS = (process.env.EXPO_PUBLIC_DEEP_LINK_HOSTS || 'app.chatwoo
   .split(',')
   .map((host: string) => host.trim())
   .filter(Boolean);
+// Background of the splash screen and Android adaptive icon.
+const BRAND_COLOR = process.env.EXPO_PUBLIC_BRAND_COLOR || '#ffffff';
 const IOS_PERSONAL_TEAM = process.env.EXPO_PUBLIC_IOS_PERSONAL_TEAM === 'true';
 
 export default ({ config }: ConfigContext): ExpoConfig => {
@@ -47,7 +49,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           }),
     },
     android: {
-      adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#ffffff' },
+      adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: BRAND_COLOR },
       package: APP_ID,
       permissions: [
         'android.permission.CAMERA',
@@ -95,7 +97,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           image: './assets/splash.png',
           resizeMode: 'contain',
-          backgroundColor: '#ffffff',
+          backgroundColor: BRAND_COLOR,
           enableFullScreenImage_legacy: true,
         },
       ],
