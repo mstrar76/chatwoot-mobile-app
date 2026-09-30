@@ -1,0 +1,42 @@
+{
+  "font": { "family": "Manrope", "weights": [500, 700, 800] },
+  "light": {
+    "primary": "#4A3AC7",
+    "primary-pressed": "#3629A0",
+    "primary-tint": "#ECEAFB",
+    "primary-text": "#4A3AC7",
+    "on-primary": "#FFFFFF",
+    "on-primary-tint": "#3629A0",
+    "accent": "#F4B63F",
+    "on-accent": "#1A1830",
+    "background": "#FAFAFD",
+    "surface": "#FFFFFF",
+    "border": "#E4E2EF",
+    "text": "#1A1830",
+    "text-secondary": "#5B5875",
+    "danger": "#D42A46",
+    "success": "#1B7F5A"
+  },
+  "dark": {
+    "primary": "#6656E0",
+    "primary-pressed": "#4A3AC7",
+    "primary-tint": "#27234F",
+    "primary-text": "#9D94FA",
+    "on-primary": "#FFFFFF",
+    "on-primary-tint": "#C9C4FF",
+    "accent": "#F4B63F",
+    "on-accent": "#1A1830",
+    "background": "#121020",
+    "surface": "#1C1A2E",
+    "border": "#2E2B45",
+    "text": "#F2F1FA",
+    "text-secondary": "#A9A6C2",
+    "danger": "#FF7A8C",
+    "success": "#5FD3A6"
+  },
+  "app": {
+    "android-adaptive-icon-background": "#4A3AC7",
+    "splash-background": "#4A3AC7",
+    "android-notification-color": "#4A3AC7"
+  }
+}

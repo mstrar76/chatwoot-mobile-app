@@ -24,6 +24,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: 'light',
     scheme: APP_SCHEME,
     ios: {
+      icon: {
+        light: './assets/icon.png',
+        dark: './assets/icon-dark.png',
+        tinted: './assets/icon-tinted.png',
+      },
       supportsTablet: true,
       bundleIdentifier: APP_ID,
       infoPlist: {
@@ -49,7 +54,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           }),
     },
     android: {
-      adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: BRAND_COLOR },
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-icon.png',
+        monochromeImage: './assets/adaptive-icon-monochrome.png',
+        backgroundColor: BRAND_COLOR,
+      },
       package: APP_ID,
       permissions: [
         'android.permission.CAMERA',

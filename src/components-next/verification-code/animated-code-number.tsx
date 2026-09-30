@@ -10,6 +10,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { tailwind } from '@/theme';
+
 export type StatusType = 'inProgress' | 'correct' | 'wrong';
 
 export type AnimatedCodeNumberProps = {
@@ -24,7 +26,7 @@ export const AnimatedCodeNumber: React.FC<AnimatedCodeNumberProps> = ({
   status,
 }) => {
   const correctColor = 'hsl(151, 40.2%, 54.1%)'; // green-600
-  const activeColor = 'hsl(206, 100%, 50%)'; // blue-800
+  const activeColor = tailwind.color('bg-blue-800') as string;
   const defaultColor = 'hsl(0, 0%, 89.5%)'; // gray-300
 
   const rBoxStyle = useAnimatedStyle(() => {

@@ -10,12 +10,15 @@ const radixUIDarkColors = require('./colors/dark');
 const blackA = require('./colors/blackA');
 // White with alpha variations
 const whiteA = require('./colors/whiteA');
+// White-label overrides (EXPO_PUBLIC_BRAND_PALETTE)
+const { getBrandColors } = require('./colors/brand');
 
 const chatwootAppColors = {
   ...blackA,
   ...whiteA,
   ...radixUILightColors,
   ...radixUIDarkColors,
+  ...getBrandColors(process.env.EXPO_PUBLIC_BRAND_PALETTE),
 };
 
 export const twConfig = {
