@@ -20,6 +20,8 @@ export interface SessionsState {
   returnToId: string | null;
   // Conversation list shows every signed-in account at once.
   unifiedView?: boolean;
+  // Accounts (`sessionId/accountId`) left out of the unified list.
+  unifiedExcluded?: string[];
 }
 
 export const initialSessionsState: SessionsState = {
@@ -29,14 +31,28 @@ export const initialSessionsState: SessionsState = {
 };
 
 export const setUnifiedView = createAction<boolean>('sessions/setUnifiedView');
+export const toggleUnifiedAccount = createAction<string>('sessions/toggleUnifiedAccount');
 
 // Cross-slice transitions are applied in `sessionsRootReducer`; this reducer only owns the
-// unified-view preference.
+// unified-view preferences.
 const sessionsReducer = (
   state: SessionsState = initialSessionsState,
   action: { type: string; payload?: unknown },
-): SessionsState =>
-  setUnifiedView.match(action) ? { ...state, unifiedView: action.payload } : state;
+): SessionsState => {
+  if (setUnifiedView.match(action)) {
+    return { ...state, unifiedView: action.payload };
+  }
+  if (toggleUnifiedAccount.match(action)) {
+    const excluded = state.unifiedExcluded ?? [];
+    return {
+      ...state,
+      unifiedExcluded: excluded.includes(action.payload)
+        ? excluded.filter(key => key !== action.payload)
+        : [...excluded, action.payload],
+    };
+  }
+  return state;
+};
 
 export const switchSession = createAction<{ sessionId: string; accountId?: number }>(
   'sessions/switch',

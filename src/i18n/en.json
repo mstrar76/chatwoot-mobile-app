@@ -590,6 +590,7 @@
   "UNIFIED": {
     "ALL_ACCOUNTS": "All accounts",
     "EMPTY": "No conversations in your accounts.",
-    "FAILED": "Could not load: %{accounts}"
+    "FAILED": "Could not load: %{accounts}",
+    "NONE_SELECTED": "Tap an account above to include it."
   }
 }

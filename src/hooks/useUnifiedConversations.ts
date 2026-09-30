@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 
 import { useAppSelector } from '@/hooks';
-import { selectSessions } from '@/store/sessions/sessionsSelectors';
+import { selectSessions, selectUnifiedExcluded } from '@/store/sessions/sessionsSelectors';
 import { selectFilters } from '@/store/conversation/conversationFilterSlice';
 import {
   fetchUnifiedConversations,
@@ -15,10 +15,12 @@ const REFRESH_INTERVAL_MS = 30_000;
 export const useUnifiedConversations = () => {
   const sessions = useAppSelector(selectSessions);
   const filters = useAppSelector(selectFilters);
+  const excludedAccounts = useAppSelector(selectUnifiedExcluded);
   const isFocused = useIsFocused();
 
   const [conversations, setConversations] = useState<UnifiedConversation[]>([]);
   const [failedAccounts, setFailedAccounts] = useState<string[]>([]);
+  const [unreadByAccount, setUnreadByAccount] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const requestId = useRef(0);
@@ -29,17 +31,18 @@ export const useUnifiedConversations = () => {
       if (manual) {
         setIsRefreshing(true);
       }
-      const result = await fetchUnifiedConversations(sessions, filters);
+      const result = await fetchUnifiedConversations(sessions, filters, excludedAccounts);
       // Ignore a slower, older request that finished after a newer one.
       if (id !== requestId.current) {
         return;
       }
       setConversations(result.conversations);
       setFailedAccounts(result.failedAccounts);
+      setUnreadByAccount(result.unreadByAccount);
       setIsLoading(false);
       setIsRefreshing(false);
     },
-    [sessions, filters],
+    [sessions, filters, excludedAccounts],
   );
 
   useEffect(() => {
@@ -51,5 +54,12 @@ export const useUnifiedConversations = () => {
     return () => clearInterval(timer);
   }, [isFocused, load]);
 
-  return { conversations, failedAccounts, isLoading, isRefreshing, refresh: () => load(true) };
+  return {
+    conversations,
+    failedAccounts,
+    unreadByAccount,
+    isLoading,
+    isRefreshing,
+    refresh: () => load(true),
+  };
 };

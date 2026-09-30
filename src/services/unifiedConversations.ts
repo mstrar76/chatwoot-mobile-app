@@ -17,6 +17,8 @@ export interface UnifiedFetchResult {
   conversations: UnifiedConversation[];
   // Accounts whose request failed (offline server, expired token...), by name.
   failedAccounts: string[];
+  // Conversations with unread messages among the loaded ones, by `sessionId/accountId`.
+  unreadByAccount: Record<string, number>;
 }
 
 // Talks to each installation directly with its own credentials, so the unified list does not
@@ -49,14 +51,17 @@ const fetchAccountConversations = async (
 export const fetchUnifiedConversations = async (
   sessions: StoredSession[],
   filters: FilterState,
+  excludedAccounts: string[] = [],
 ): Promise<UnifiedFetchResult> => {
-  const targets = sessions.flatMap(session =>
-    (session.user.accounts ?? []).map(account => ({
-      session,
-      accountId: Number(account.id),
-      accountName: account.name,
-    })),
-  );
+  const targets = sessions
+    .flatMap(session =>
+      (session.user.accounts ?? []).map(account => ({
+        session,
+        accountId: Number(account.id),
+        accountName: account.name,
+      })),
+    )
+    .filter(({ session, accountId }) => !excludedAccounts.includes(`${session.id}/${accountId}`));
 
   const results = await Promise.allSettled(
     targets.map(({ session, accountId }) => fetchAccountConversations(session, accountId, filters)),
@@ -64,12 +69,16 @@ export const fetchUnifiedConversations = async (
 
   const conversations: UnifiedConversation[] = [];
   const failedAccounts: string[] = [];
+  const unreadByAccount: Record<string, number> = {};
   results.forEach((result, index) => {
     const { session, accountId, accountName } = targets[index];
     if (result.status === 'rejected') {
       failedAccounts.push(accountName);
       return;
     }
+    unreadByAccount[`${session.id}/${accountId}`] = result.value.filter(
+      conversation => conversation.unreadCount > 0,
+    ).length;
     result.value.forEach(conversation => {
       conversations.push({
         key: `${session.id}/${accountId}/${conversation.id}`,
@@ -84,5 +93,5 @@ export const fetchUnifiedConversations = async (
   conversations.sort(
     (a, b) => (b.conversation.lastActivityAt ?? 0) - (a.conversation.lastActivityAt ?? 0),
   );
-  return { conversations, failedAccounts };
+  return { conversations, failedAccounts, unreadByAccount };
 };

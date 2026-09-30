@@ -7,6 +7,10 @@ export const selectActiveSessionId = (state: RootState) => state.sessions.active
 
 export const selectUnifiedView = (state: RootState) => !!state.sessions.unifiedView;
 
+const NO_EXCLUDED: string[] = [];
+export const selectUnifiedExcluded = (state: RootState) =>
+  state.sessions.unifiedExcluded ?? NO_EXCLUDED;
+
 export const selectIsAddingSession = (state: RootState) => state.sessions.returnToId !== null;
 
 export interface SessionAccountEntry {

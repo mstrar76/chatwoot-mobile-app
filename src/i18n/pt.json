@@ -476,6 +476,7 @@
   "UNIFIED": {
     "ALL_ACCOUNTS": "Todas as contas",
     "EMPTY": "Nenhuma conversa nas suas contas.",
-    "FAILED": "Não foi possível carregar: %{accounts}"
+    "FAILED": "Não foi possível carregar: %{accounts}",
+    "NONE_SELECTED": "Toque numa conta acima para incluí-la."
   }
 }

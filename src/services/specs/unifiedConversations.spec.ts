@@ -68,4 +68,31 @@ describe('fetchUnifiedConversations', () => {
     expect(result.conversations).toHaveLength(1);
     expect(result.failedAccounts).toEqual(['AqueceBem']);
   });
+
+  it('skips excluded accounts and counts unread conversations per account', async () => {
+    mockedGet.mockResolvedValueOnce(
+      listResponse([
+        { id: 10, last_activity_at: 100, unread_count: 2 },
+        { id: 11, last_activity_at: 90, unread_count: 0 },
+        { id: 12, last_activity_at: 80, unread_count: 1 },
+      ] as never),
+    );
+
+    const result = await fetchUnifiedConversations(
+      [
+        session('a.example.com', [
+          { id: 1, name: 'iTelas' },
+          { id: 2, name: 'AqueceBem' },
+        ]),
+      ],
+      defaultFilterState,
+      ['a.example.com#1/2'],
+    );
+
+    expect(mockedGet).toHaveBeenCalledTimes(1);
+    expect(mockedGet.mock.calls[0][0]).toBe(
+      'https://a.example.com/api/v1/accounts/1/conversations',
+    );
+    expect(result.unreadByAccount).toEqual({ 'a.example.com#1/1': 2 });
+  });
 });

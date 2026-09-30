@@ -1,6 +1,12 @@
 import { appReducer } from '@/store/reducers';
 import { createSessionsRootReducer } from '../sessionsRootReducer';
-import { beginAddSession, cancelAddSession, setUnifiedView, switchSession } from '../sessionsSlice';
+import {
+  beginAddSession,
+  cancelAddSession,
+  setUnifiedView,
+  switchSession,
+  toggleUnifiedAccount,
+} from '../sessionsSlice';
 import { setFilters } from '@/store/conversation/conversationFilterSlice';
 import type { User } from '@/types/User';
 
@@ -129,6 +135,17 @@ describe('sessionsRootReducer', () => {
     state = signIn(state, 'b.example.com', makeUser(7, [1]), 'tokB');
     state = rootReducer(state, switchSession({ sessionId: 'a.example.com#1' }));
     expect(state.sessions.unifiedView).toBe(true);
+  });
+
+  it('toggles accounts out of and back into the unified list, across switches', () => {
+    let state = signIn(initial, 'a.example.com', makeUser(1, [1]), 'tokA');
+    state = rootReducer(state, toggleUnifiedAccount('a.example.com#1/1'));
+    expect(state.sessions.unifiedExcluded).toEqual(['a.example.com#1/1']);
+    state = rootReducer(state, beginAddSession());
+    state = signIn(state, 'b.example.com', makeUser(7, [1]), 'tokB');
+    expect(state.sessions.unifiedExcluded).toEqual(['a.example.com#1/1']);
+    state = rootReducer(state, toggleUnifiedAccount('a.example.com#1/1'));
+    expect(state.sessions.unifiedExcluded).toEqual([]);
   });
 
   it('does not create a new state object for unrelated actions', () => {
